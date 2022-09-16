@@ -1,0 +1,15 @@
+{
+  "name": "@signed/testcafe-reporter-raw",
+  "version": "0.1.0",
+  "description": "reporter that writes all interactions to the console",
+  "license": "MIT",
+  "keywords": [
+    "testcafe",
+    "reporter"
+  ],
+  "main": "src/index.js",
+  "files": [
+    "README.md",
+    "src"
+  ]
+}
