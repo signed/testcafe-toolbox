@@ -4,6 +4,11 @@ Intended for exploring the reporter api protocol in testcafe.
 Each interaction with the customer reporter is serialize and written to the console.
 
 # How to use
-tbd
+Testcafe does not support [scoped reports](https://github.com/DevExpress/testcafe/issues/4692#issuecomment-578790454).
+The proposed workaround is to rename the package during install lik this
+
+````shell
+yarn add -D testcafe-reporter-raw@npm:@signed/testcafe-reporter-raw
+````
 
 [testcafe-reporter]: https://testcafe.io/documentation/402810/guides/extend-testcafe/reporter-plugin

@@ -1,5 +1,6 @@
-export default function () {
+module.exports = function () {
     return {
+        noColors: true,
         calls: [],
 
         _push: function (call) {
@@ -7,6 +8,17 @@ export default function () {
             this.newline()
             this.calls.push(JSON.stringify(call, null, 2));
         },
+
+        reportWarnings(warning, ...rest) {
+            this._push({
+                methodName: 'reportWarnings',
+                arguments: {
+                    warning
+                },
+                additionalArguments: rest
+            });
+        },
+
         reportTaskStart(startTime, userAgents, testCount, ..._rest) {
             this._push({
                 methodName: 'reportTaskStart',
@@ -78,16 +90,6 @@ export default function () {
             });
         },
 
-        reportWarnings(warning, ...rest) {
-            this._push({
-                methodName: 'reportWarnings',
-                arguments: {
-                    warning
-                },
-                additionalArguments: rest
-            });
-        },
-
         reportTaskDone(endTime, passed, warnings, result, ...rest) {
             this._push({
                 methodName: 'reportTaskDone',
@@ -103,4 +105,4 @@ export default function () {
             this.newline();
         }
     };
-}
+};
