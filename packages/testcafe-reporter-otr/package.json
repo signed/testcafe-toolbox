@@ -1,0 +1,32 @@
+{
+  "name": "@signed/testcafe-reporter-otr",
+  "version": "0.1.1",
+  "license": "MIT",
+  "keywords": [
+    "testcafe",
+    "reporter"
+  ],
+  "homepage": "https://github.com/signed/testcafe-toolbox/tree/main/packages/testcafe-reporter-otr",
+  "repository": "@signed/testcafe-toolbox",
+  "main": "lib/index.js",
+  "files": [
+    "README.md",
+    "src",
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "io-ts": "2.2.18",
+    "io-ts-types": "0.5.16"
+  },
+  "devDependencies": {
+    "@signed/prettier-config": "0.1.0",
+    "@types/node": "18.7.18",
+    "prettier": "2.7.1",
+    "typescript": "4.8.3"
+  },
+  "prettier": "@signed/prettier-config"
+}
