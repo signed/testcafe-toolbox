@@ -50,13 +50,6 @@ export type TestRunInfo = {
   warnings: string[]
 }
 
-export type DashboardTestRunInfo = {
-  warnings: string[]
-  unstable: boolean
-  quarantine: Quarantine | null
-  browserRuns: Record<string, BrowserRunInfo>
-}
-
 export type Meta = Record<string, string>
 
 export type Quarantine = {
@@ -81,32 +74,9 @@ export type Video = Readonly<{
   testRunId: string
 }>
 
-export type BrowserRunInfo = {
-  browser: BrowserInfo
-  screenshotUploadIds?: string[]
-  videoUploadIds?: string[]
-  actions?: ActionInfo[]
-  thirdPartyError?: TestError
-  quarantineAttempt?: number
-  warnings?: Warning[]
-}
-
-export type ActionInfo = {
-  duration?: number
-  apiName: string
-  testPhase: TestPhase
-  command: Record<string, any> & { type: CommandType }
-  error?: TestError
-}
-
 export type Warning = {
   message: string
   testRunId?: string
-}
-
-export type WarningsInfo = {
-  testRunId?: string
-  warnings: Warning[]
 }
 
 export enum TestPhase {
