@@ -1,3 +1,4 @@
+import { createWriteStream } from 'fs'
 import { createCB } from 'xmlbuilder2'
 import { Context, Element, Namespace, NamespaceRegistry, QualifiedName, XmlEmitter } from './xml'
 
@@ -14,20 +15,51 @@ const constructNamespacesFrom = (context: Context) => {
   return eventsAttributes
 }
 
+interface Writer {
+  write(chunk: string): void
+  close(): void
+}
+
+export const intoFile = (filename: string): Writer => {
+  const outStream = createWriteStream(filename)
+
+  return new (class implements Writer {
+    write(chunk: string): void {
+      outStream.write(chunk)
+    }
+    close(): void {
+      outStream.close()
+    }
+  })()
+}
+
+export const intoString = (): Writer & { readonly xml: string } => {
+  let xml = ''
+  return new (class implements Writer {
+    get xml() {
+      return xml
+    }
+    write(chunk: string): void {
+      xml += chunk
+    }
+    close(): void {
+      // noting to close
+    }
+  })()
+}
+
 export class EventsWriter {
   private readonly namespaceRegistry: NamespaceRegistry
   private context: Context | undefined
-
-  result = ''
 
   constructor(namespaceRegistry: NamespaceRegistry) {
     this.namespaceRegistry = namespaceRegistry
   }
 
-  startEmitting() {
+  startEmitting(target: Writer) {
     const xmlBuilder = createCB({
-      data: (chunk: any) => (this.result += chunk),
-      end: () => console.log(this.result),
+      data: target.write,
+      end: target.close,
       prettyPrint: true,
     })
     this.context = { xmlBuilder, namespaceRegistry: this.namespaceRegistry }

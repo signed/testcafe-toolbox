@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { coreNamespace, hostName, infrastructure, result, userName } from './core'
-import { eventsNamespace, EventsWriter, finished, started } from './events'
+import { eventsNamespace, EventsWriter, finished, intoString, started } from './events'
 import { javaNamespace, javaVersion } from './java'
 import { NamespaceRegistry } from './xml'
 
@@ -8,7 +8,8 @@ test('events example', () => {
   const clock = new FixedTime(new Date(1664127808347))
 
   const namespaceRegistry = NamespaceRegistry.of(coreNamespace, { e: eventsNamespace, java: javaNamespace })
-  const events = new EventsWriter(namespaceRegistry).startEmitting()
+  const target = intoString()
+  const events = new EventsWriter(namespaceRegistry).startEmitting(target)
 
   // prettier-ignore
   events.append(infrastructure((_) => _
@@ -22,7 +23,7 @@ test('events example', () => {
   events.append(finished('2', clock.now(), (finished) => finished.append(result('FAILED'))))
   events.append(finished('1', clock.now(), (finished) => finished.append(result('FAILED'))))
   events.close()
-  expect(events.result).toMatchSnapshot()
+  expect(target.xml).toMatchSnapshot()
 })
 
 export interface Clock {
@@ -31,6 +32,7 @@ export interface Clock {
 
 export class FixedTime implements Clock {
   private readonly _now: Date
+
   constructor(now: Date) {
     this._now = now
   }
