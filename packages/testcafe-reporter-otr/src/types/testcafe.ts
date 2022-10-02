@@ -1,3 +1,78 @@
+export type TestStartInfo = {
+  testId: string
+  testRunIds: string[]
+  startTime: string
+  skipped: boolean
+}
+
+export type TestCafeActionInfo = {
+  browser: BrowserInfo
+  duration?: number
+  err?: Error
+  test: {
+    name: string
+    phase: TestPhase
+    id: string
+  }
+  testRunId: string
+}
+
+export type decoratorFn = (str: string) => string
+
+export type ReporterPluginHost = {
+  indentString(str: string, indentVal: number): string
+  wordWrap(str: string, indentVal: number, width: number): string
+  escapeHtml(str: string): string
+  newline(): ReporterPluginHost
+  write(text: string): ReporterPluginHost
+  useWordWrap(use: boolean): ReporterPluginHost
+  setIndent(val: number): ReporterPluginHost
+}
+
+export type TaskResult = {
+  failedCount: number
+  passedCount: number
+  skippedCount: number
+}
+
+export type ReporterMethods = {
+  init?: (this: ReporterPluginHost) => Promise<void>
+  reportTaskStart: (
+    this: ReporterPluginHost,
+    startTime: Date,
+    userAgents: string[],
+    testCount: number,
+    taskStructure: ReportedTestStructureItem[],
+  ) => Promise<void>
+  reportFixtureStart: (this: ReporterPluginHost, name: string, path: string, meta: Meta) => Promise<void>
+  reportTestStart?: (this: ReporterPluginHost, name: string, meta: Meta, testStartInfo: TestStartInfo) => Promise<void>
+  reportTestActionStart?: (
+    this: ReporterPluginHost,
+    apiActionName: string,
+    actionInfo: TestCafeActionInfo,
+  ) => Promise<void>
+  reportTestActionDone?: (
+    this: ReporterPluginHost,
+    apiActionName: string,
+    actionInfo: TestCafeActionInfo,
+  ) => Promise<void>
+  reportTestDone: (this: ReporterPluginHost, name: string, testRunInfo: TestRunInfo, meta?: Meta) => Promise<void>
+  reportTaskDone: (
+    this: ReporterPluginHost,
+    endTime: Date,
+    passed: number,
+    warnings: string[],
+    result: TaskResult,
+  ) => Promise<void>
+  reportWarnings: (this: ReporterPluginHost, warnings: Warning) => Promise<void>
+}
+
+export type ReporterPluginObject = ReporterMethods & {
+  noColors: boolean
+  createErrorDecorator(): Record<string, decoratorFn>
+  getReportUrl(): string
+}
+
 export type BrowserInfo = {
   alias: string
   engine: { name: string; version: string }
@@ -8,12 +83,6 @@ export type BrowserInfo = {
   prettyUserAgent: string
   userAgent: string
   version: string
-}
-
-export type TestError = {
-  testRunPhase: string
-  code: string
-  errorModel: string
 }
 
 export type Error = {
@@ -92,53 +161,18 @@ export enum TestPhase {
   inBookmarkRestore = 'inBookmarkRestore',
 }
 
-export enum CommandType {
-  click = 'click',
-  rightClick = 'right-click',
-  doubleClick = 'double-click',
-  drag = 'drag',
-  dragToElement = 'drag-to-element',
-  hover = 'hover',
-  typeText = 'type-text',
-  selectText = 'select-text',
-  selectTextAreaContent = 'select-text-area-content',
-  selectEditableContent = 'select-editable-content',
-  pressKey = 'press-key',
-  wait = 'wait',
-  navigateTo = 'navigate-to',
-  setFilesToUpload = 'set-files-to-upload',
-  clearUpload = 'clear-upload',
-  executeClientFunction = 'execute-client-function',
-  executeSelector = 'execute-selector',
-  takeScreenshot = 'take-screenshot',
-  takeElementScreenshot = 'take-element-screenshot',
-  takeScreenshotOnFail = 'take-screenshot-on-fail',
-  prepareBrowserManipulation = 'prepare-browser-manipulation',
-  showAssertionRetriesStatus = 'show-assertion-retries-status',
-  hideAssertionRetriesStatus = 'hide-assertion-retries-status',
-  setBreakpoint = 'set-breakpoint',
-  resizeWindow = 'resize-window',
-  resizeWindowToFitDevice = 'resize-window-to-fit-device',
-  maximizeWindow = 'maximize-window',
-  switchToIframe = 'switch-to-iframe',
-  switchToMainWindow = 'switch-to-main-window',
-  setNativeDialogHandler = 'set-native-dialog-handler',
-  getNativeDialogHistory = 'get-native-dialog-history',
-  getBrowserConsoleMessages = 'get-browser-console-messages',
-  setTestSpeed = 'set-test-speed',
-  setPageLoadTimeout = 'set-page-load-timeout',
-  debug = 'debug',
-  assertion = 'assertion',
-  useRole = 'useRole',
-  testDone = 'test-done',
-  backupStorages = 'backup-storages',
-  executeExpression = 'execute-expression',
-  executeAsyncExpression = 'execute-async-expression',
-  unlockPage = 'unlock-page',
-  recorder = 'recorder',
+export type ReportedTestItem = {
+  readonly id: string
+  readonly name: string
+  readonly skip: boolean
 }
 
-export type DashboardInfo = {
-  type: string
-  message: string
+export type ReportedFixtureItem = {
+  readonly id: string
+  readonly name: string
+  readonly tests: ReportedTestItem[]
+}
+
+export type ReportedTestStructureItem = {
+  readonly fixture: ReportedFixtureItem
 }
