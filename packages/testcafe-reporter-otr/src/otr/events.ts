@@ -15,7 +15,7 @@ const constructNamespacesFrom = (context: Context) => {
   return eventsAttributes
 }
 
-interface Writer {
+export interface Writer {
   write(chunk: string): void
   close(): void
 }

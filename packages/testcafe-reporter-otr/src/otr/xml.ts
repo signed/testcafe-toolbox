@@ -31,6 +31,18 @@ export class NamespaceRegistry {
   }
 }
 
+type AttributeValue = string | number | Date
+
+const attributeValueToString = (value: AttributeValue): string => {
+  if (value instanceof Date) {
+    return toXsDateTime(value)
+  }
+  if (typeof value === 'number') {
+    return value.toString(10)
+  }
+  return value
+}
+
 export class Element {
   private readonly _context: Context
   private readonly _namespace: Namespace
@@ -56,14 +68,12 @@ export class Element {
     return this
   }
 
-  withAttribute(qualifiedName: QualifiedName, value: string | Date) {
-    if (value instanceof Date) {
-      value = toXsDateTime(value)
-    }
+  withAttribute(qualifiedName: QualifiedName, value: AttributeValue) {
+    let valueAsString = attributeValueToString(value)
     if (this._namespace.equals(qualifiedName.namespace)) {
-      this._context.xmlBuilder.att(qualifiedName.simpleName, value)
+      this._context.xmlBuilder.att(qualifiedName.simpleName, valueAsString)
     } else {
-      this._context.xmlBuilder.att(qualifiedName.namespace.uri, qualifiedName.simpleName, value)
+      this._context.xmlBuilder.att(qualifiedName.namespace.uri, qualifiedName.simpleName, valueAsString)
     }
   }
 

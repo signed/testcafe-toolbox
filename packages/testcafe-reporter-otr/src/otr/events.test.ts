@@ -1,5 +1,15 @@
 import { expect, test } from '@jest/globals'
-import { coreNamespace, hostName, infrastructure, result, userName } from './core'
+import {
+  Clock,
+  coreNamespace,
+  directorySource,
+  filePosition,
+  fileSource,
+  hostName,
+  infrastructure,
+  result,
+  userName,
+} from './core'
 import { eventsNamespace, EventsWriter, finished, intoString, started } from './events'
 import { javaNamespace, javaVersion } from './java'
 import { NamespaceRegistry } from './xml'
@@ -21,14 +31,21 @@ test('events example', () => {
   events.append(started('1', 'container', clock.now()))
   events.append(started('2', 'test', clock.now(), (started) => started.withParentId('1')))
   events.append(finished('2', clock.now(), (finished) => finished.append(result('FAILED'))))
-  events.append(finished('1', clock.now(), (finished) => finished.append(result('FAILED'))))
+  events.append(
+    finished('1', clock.now(), (finished) =>
+      finished
+        .append(directorySource('/tmp/directory'))
+        .append(
+          fileSource('/tmp/screenshot.png', (fileSource) => {
+            fileSource.append(filePosition(42, 17))
+          }),
+        )
+        .append(result('FAILED')),
+    ),
+  )
   events.close()
   expect(target.xml).toMatchSnapshot()
 })
-
-export interface Clock {
-  now(): Date
-}
 
 export class FixedTime implements Clock {
   private readonly _now: Date
