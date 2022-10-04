@@ -66,7 +66,7 @@ export const result = (status: Status) => {
   return (context: Context) => {
     const result = new Result(context).openTag()
     result.withAttribute(Result.Status, status)
-    context.xmlBuilder.up()
+    result.closeTag()
   }
 }
 
