@@ -9,6 +9,9 @@ import {
   infrastructure,
   coreNamespace,
   sources,
+  metadata,
+  tags,
+  tag,
 } from './core'
 import { eventsNamespace, EventsWriter, finished, intoString, started } from './events'
 import { javaNamespace, javaVersion } from './java'
@@ -35,6 +38,17 @@ test('events example', () => {
   events.append(
     finished('1', clock.now(), (finished) => {
       finished
+        .append(
+          metadata((metadata) => {
+            metadata.append(
+              tags((tags) => {
+                tags.append(tag('one'))
+                tags.append(tag('two'))
+                tags.append(tag('three'))
+              }),
+            )
+          }),
+        )
         .append(
           sources((_) =>
             _.append(directorySource('/tmp/directory')).append(

@@ -20,6 +20,19 @@ exports[`events example 1`] = `
     <result status="FAILED"/>
   </e:finished>
   <e:finished id="1" time="2022-09-25T17:43:28.347Z">
+    <metadata>
+      <tags>
+        <tag>
+          one
+        </tag>
+        <tag>
+          two
+        </tag>
+        <tag>
+          three
+        </tag>
+      </tags>
+    </metadata>
     <sources>
       <directorySource path="/tmp/directory"/>
       <fileSource path="/tmp/screenshot.png">
