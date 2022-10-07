@@ -8,6 +8,7 @@ import {
   userName,
   infrastructure,
   coreNamespace,
+  sources,
 } from './core'
 import { eventsNamespace, EventsWriter, finished, intoString, started } from './events'
 import { javaNamespace, javaVersion } from './java'
@@ -32,16 +33,19 @@ test('events example', () => {
   events.append(started('2', 'test', clock.now(), (started) => started.withParentId('1')))
   events.append(finished('2', clock.now(), (finished) => finished.append(result('FAILED'))))
   events.append(
-    finished('1', clock.now(), (finished) =>
+    finished('1', clock.now(), (finished) => {
       finished
-        .append(directorySource('/tmp/directory'))
         .append(
-          fileSource('/tmp/screenshot.png', (fileSource) => {
-            fileSource.append(filePosition(42, 17))
-          }),
+          sources((_) =>
+            _.append(directorySource('/tmp/directory')).append(
+              fileSource('/tmp/screenshot.png', (fileSource) => {
+                fileSource.append(filePosition(42, 17))
+              }),
+            ),
+          ),
         )
-        .append(result('FAILED')),
-    ),
+        .append(result('FAILED'))
+    }),
   )
   events.close()
   expect(target.xml).toMatchSnapshot()

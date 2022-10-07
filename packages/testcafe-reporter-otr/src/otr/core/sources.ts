@@ -1,19 +1,19 @@
 import { Context, QualifiedName, Element } from '../xml/xml'
 import { coreNamespace } from './namespace'
 
-class Source extends Element {
-  static readonly Element = QualifiedName.of(coreNamespace, 'source')
+class Sources extends Element {
+  static readonly Element = QualifiedName.of(coreNamespace, 'sources')
 
   constructor(context: Context) {
-    super(context, Source.Element)
+    super(context, Sources.Element)
   }
 }
 
-export const source = (consumer: (source: Source) => void) => {
+export const sources = (consumer: (sources: Sources) => void) => {
   return (context: Context) => {
-    const source = new Source(context).openTag()
-    consumer(source)
-    source.closeTag()
+    const sourcesElement = new Sources(context).openTag()
+    consumer(sourcesElement)
+    sourcesElement.closeTag()
   }
 }
 

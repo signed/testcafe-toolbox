@@ -20,10 +20,12 @@ exports[`events example 1`] = `
     <result status="FAILED"/>
   </e:finished>
   <e:finished id="1" time="2022-09-25T17:43:28.347Z">
-    <directorySource path="/tmp/directory"/>
-    <fileSource path="/tmp/screenshot.png">
-      <filePosition line="42" column="17"/>
-    </fileSource>
+    <sources>
+      <directorySource path="/tmp/directory"/>
+      <fileSource path="/tmp/screenshot.png">
+        <filePosition line="42" column="17"/>
+      </fileSource>
+    </sources>
     <result status="FAILED"/>
   </e:finished>
 </e:events>"

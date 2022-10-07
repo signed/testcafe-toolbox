@@ -1,5 +1,5 @@
 import { Clock, SystemTime } from './otr/clock'
-import { coreNamespace, fileSource, hostName, infrastructure, result, Status, userName } from './otr/core'
+import { coreNamespace, fileSource, hostName, infrastructure, result, sources, Status, userName } from './otr/core'
 
 import { eventsNamespace, EventsWriter, finished, started, Writer } from './otr/events'
 import { NamespaceRegistry } from './otr/xml/xml'
@@ -80,7 +80,7 @@ module.exports = function pluginFactory(): ReporterPluginObject {
       currentFixtureId = id
       events.append(
         started(id, name, clock.now(), (started) => {
-          started.append(fileSource(path))
+          started.append(sources((sources) => sources.append(fileSource(path))))
         }),
       )
     },
