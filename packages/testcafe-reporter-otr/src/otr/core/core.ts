@@ -1,4 +1,4 @@
-import { Context, Element, Namespace, QualifiedName } from './xml'
+import { Context, Element, Namespace, QualifiedName } from '../xml/xml'
 
 export const coreNamespace = Namespace.of('https://schemas.opentest4j.org/reporting/core/0.1.0')
 

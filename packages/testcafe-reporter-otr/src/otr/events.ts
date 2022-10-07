@@ -1,6 +1,6 @@
 import { createWriteStream } from 'fs'
 import { createCB } from 'xmlbuilder2'
-import { Context, Element, Namespace, NamespaceRegistry, QualifiedName, XmlEmitter } from './xml'
+import { Context, Element, Namespace, NamespaceRegistry, QualifiedName, XmlEmitter } from './xml/xml'
 
 export const eventsNamespace = Namespace.of('https://schemas.opentest4j.org/reporting/events/0.1.0')
 

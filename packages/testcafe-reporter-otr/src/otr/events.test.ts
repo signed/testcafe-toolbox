@@ -9,10 +9,10 @@ import {
   infrastructure,
   result,
   userName,
-} from './core'
+} from './core/core'
 import { eventsNamespace, EventsWriter, finished, intoString, started } from './events'
 import { javaNamespace, javaVersion } from './java'
-import { NamespaceRegistry } from './xml'
+import { NamespaceRegistry } from './xml/xml'
 
 test('events example', () => {
   const clock = new FixedTime(new Date(1664127808347))
