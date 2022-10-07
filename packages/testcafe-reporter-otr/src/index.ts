@@ -1,19 +1,17 @@
-import {
-  Clock,
-  coreNamespace,
-  fileSource,
-  hostName,
-  infrastructure,
-  result,
-  Status,
-  SystemTime,
-  userName,
-} from './otr/core'
-import { eventsNamespace, EventsWriter, finished, started, Writer } from './otr/events'
-import { NamespaceRegistry } from './otr/xml'
+import { Clock, SystemTime } from './otr/clock'
+import { coreNamespace, fileSource, hostName, infrastructure, result, Status, userName } from './otr/core'
 
-import { Meta, ReportedTestStructureItem, TestRunInfo } from './types/testcafe'
-import { ReporterPluginHost, ReporterPluginObject, TestStartInfo } from './types/testcafe'
+import { eventsNamespace, EventsWriter, finished, started, Writer } from './otr/events'
+import { NamespaceRegistry } from './otr/xml/xml'
+
+import {
+  Meta,
+  ReportedTestStructureItem,
+  ReporterPluginHost,
+  ReporterPluginObject,
+  TestRunInfo,
+  TestStartInfo,
+} from './types/testcafe'
 
 const intoReporterPlugin = (host: ReporterPluginHost): Writer => {
   return new (class implements Writer {

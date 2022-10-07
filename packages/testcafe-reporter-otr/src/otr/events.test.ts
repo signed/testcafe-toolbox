@@ -1,18 +1,18 @@
 import { expect, test } from '@jest/globals'
 import {
-  Clock,
-  coreNamespace,
   directorySource,
   filePosition,
   fileSource,
   hostName,
-  infrastructure,
   result,
   userName,
-} from './core/core'
+  infrastructure,
+  coreNamespace,
+} from './core'
 import { eventsNamespace, EventsWriter, finished, intoString, started } from './events'
 import { javaNamespace, javaVersion } from './java'
 import { NamespaceRegistry } from './xml/xml'
+import { Clock } from './clock'
 
 test('events example', () => {
   const clock = new FixedTime(new Date(1664127808347))
