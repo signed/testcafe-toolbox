@@ -75,6 +75,7 @@ export class Element {
     } else {
       this._context.xmlBuilder.att(qualifiedName.namespace.uri, qualifiedName.simpleName, valueAsString)
     }
+    return this
   }
 
   withContent(version: string) {

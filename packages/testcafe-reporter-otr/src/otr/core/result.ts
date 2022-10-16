@@ -1,7 +1,7 @@
 import { Context, QualifiedName, Element } from '../xml/xml'
 import { coreNamespace } from './namespace'
 
-const statuses = ['SKIPPED', 'ABORTED', 'SUCCESSFUL', 'FAILED'] as const
+const statuses = ['SKIPPED', 'ABORTED', 'SUCCESSFUL', 'FAILED', 'FLAKY'] as const
 export type Status = typeof statuses[number]
 
 class Result extends Element {
@@ -13,10 +13,11 @@ class Result extends Element {
   }
 }
 
-export const result = (status: Status) => {
+export const result = (status: Status, consumer?: (result: Result) => void) => {
   return (context: Context) => {
     const result = new Result(context).openTag()
     result.withAttribute(Result.Status, status)
+    consumer?.(result)
     result.closeTag()
   }
 }

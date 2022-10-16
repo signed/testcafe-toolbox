@@ -2,7 +2,8 @@
   "name": "@signed/testcafe-toolbox-example",
   "private": true,
   "scripts": {
-    "testcafe:quarantine": "testcafe --reporter spec,raw:out/raw.log,otr:out/otr.xml --quarantine-mode attemptLimit=4,successThreshold=2 chrome fixtures/quarantine",
+    "testcafe:quarantine": "testcafe --reporter spec,raw:out/raw-quarantine.txt,otr:out/otr-quarantine.xml --quarantine-mode attemptLimit=4,successThreshold=2 opera,chrome fixtures/quarantine",
+    "testcafe:plain": "testcafe --reporter spec,raw:out/raw-plain.txt,otr:out/otr-plain.xml opera,chrome fixtures/quarantine",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

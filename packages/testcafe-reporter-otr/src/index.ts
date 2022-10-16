@@ -2,6 +2,7 @@ import { Clock, SystemTime } from './otr/clock'
 import { coreNamespace, fileSource, hostName, infrastructure, result, sources, Status, userName } from './otr/core'
 
 import { eventsNamespace, EventsWriter, finished, started, Writer } from './otr/events'
+import { execution, retryNamespace } from './otr/retry'
 import { NamespaceRegistry } from './otr/xml/xml'
 
 import {
@@ -39,6 +40,22 @@ const toStatus = (testRunInfo: TestRunInfo): Status => {
 
 type Test = {
   start: Date
+  environments: Environment[]
+}
+
+type Environment = {
+  name: string
+  executions: TestExecution[]
+}
+
+type TestExecution = {
+  id: string
+  status: Status
+  //should contain artifacts from the execution like
+  //- screenshot
+  //- video
+  //- stacktrace
+  //- assertion error
 }
 
 module.exports = function pluginFactory(): ReporterPluginObject {
@@ -50,7 +67,7 @@ module.exports = function pluginFactory(): ReporterPluginObject {
   return {
     noColors: true,
     init: async function () {
-      const namespaceRegistry = NamespaceRegistry.of(coreNamespace, { e: eventsNamespace })
+      const namespaceRegistry = NamespaceRegistry.of(coreNamespace, { e: eventsNamespace, r: retryNamespace })
       events = new EventsWriter(namespaceRegistry).startEmitting(intoReporterPlugin(this))
       events.append(infrastructure((_) => _.append(hostName('wonderland')).append(userName('alice'))))
     },
@@ -87,7 +104,7 @@ module.exports = function pluginFactory(): ReporterPluginObject {
     reportTestStart: async function (name: string, meta: Meta, testStartInfo: TestStartInfo) {
       const start = new Date(testStartInfo.startTime)
       const testId = testStartInfo.testId
-      tests.set(testId, { start })
+      tests.set(testId, { start, environments: [] })
       events.append(started(testId, name, start, (_) => _.withParentId(currentFixtureId)))
     },
     reportTestDone: async function (name: string, testRunInfo: TestRunInfo, _meta?: Meta) {
@@ -97,9 +114,37 @@ module.exports = function pluginFactory(): ReporterPluginObject {
         throw new Error(`no test data found for test "${testId}"`)
       }
       const end = new Date(test.start.getTime() + testRunInfo.durationMs)
+      const environments = testRunInfo.browsers.map((browser) => {
+        const environment: Environment = { name: browser.name, executions: [] }
+        browser.quarantineAttemptsTestRunIds?.forEach((runId) => {
+          const quarantine = testRunInfo.quarantine
+          if (quarantine === null) {
+            throw new Error('quarantine not present, although quarantineAttemptsTestRunIds are. Should not happen')
+          }
+          const status: Status = quarantine[runId].passed ? 'SUCCESSFUL' : 'FAILED'
+          const id = runId
+
+          environment.executions.push({ id, status })
+        })
+        return environment
+      })
+      test.environments.push(...environments)
+
       events.append(
         finished(testId, end, (finished) => {
-          finished.append(result(toStatus(testRunInfo)))
+          finished.append(
+            result(toStatus(testRunInfo), (_) => {
+              test.environments.forEach((environment) => {
+                environment.executions.forEach((testcafeExecution) => {
+                  _.append(
+                    execution(testcafeExecution.status, (ex) => {
+                      ex.withId(testcafeExecution.id)
+                    }),
+                  )
+                })
+              })
+            }),
+          )
         }),
       )
     },

@@ -83,6 +83,7 @@ export type BrowserInfo = {
   prettyUserAgent: string
   userAgent: string
   version: string
+  quarantineAttemptsTestRunIds?: string[]
 }
 
 export type Error = {
@@ -122,8 +123,9 @@ export type TestRunInfo = {
 export type Meta = Record<string, string>
 
 export type Quarantine = {
-  [key: number]: {
+  [key: string]: {
     passed: boolean
+    errors: Error[]
   }
 }
 

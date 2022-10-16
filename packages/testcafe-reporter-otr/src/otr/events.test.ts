@@ -1,27 +1,32 @@
 import { expect, test } from '@jest/globals'
+import { Clock } from './clock'
 import {
+  coreNamespace,
   directorySource,
   filePosition,
   fileSource,
   hostName,
-  result,
-  userName,
   infrastructure,
-  coreNamespace,
-  sources,
   metadata,
-  tags,
+  result,
+  sources,
   tag,
+  tags,
+  userName,
 } from './core'
 import { eventsNamespace, EventsWriter, finished, intoString, started } from './events'
 import { javaNamespace, javaVersion } from './java'
+import { execution, retryNamespace } from './retry'
 import { NamespaceRegistry } from './xml/xml'
-import { Clock } from './clock'
 
 test('events example', () => {
   const clock = new FixedTime(new Date(1664127808347))
 
-  const namespaceRegistry = NamespaceRegistry.of(coreNamespace, { e: eventsNamespace, java: javaNamespace })
+  const namespaceRegistry = NamespaceRegistry.of(coreNamespace, {
+    e: eventsNamespace,
+    java: javaNamespace,
+    r: retryNamespace,
+  })
   const target = intoString()
   const events = new EventsWriter(namespaceRegistry).startEmitting(target)
 
@@ -58,7 +63,25 @@ test('events example', () => {
             ),
           ),
         )
-        .append(result('FAILED'))
+        .append(
+          result('FLAKY', (_) => {
+            _.append(
+              execution('FAILED', (execution) => {
+                execution.withId('execution one')
+              }),
+            )
+            _.append(
+              execution('FAILED', (execution) => {
+                execution.withId('execution two')
+              }),
+            )
+            _.append(
+              execution('SUCCESSFUL', (execution) => {
+                execution.withId('execution three')
+              }),
+            )
+          }),
+        )
     }),
   )
   events.close()

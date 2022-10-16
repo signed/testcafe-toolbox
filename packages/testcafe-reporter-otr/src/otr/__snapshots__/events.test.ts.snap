@@ -2,7 +2,7 @@
 
 exports[`events example 1`] = `
 "<?xml version="1.0"?>
-<e:events xmlns="https://schemas.opentest4j.org/reporting/core/0.1.0" xmlns:e="https://schemas.opentest4j.org/reporting/events/0.1.0" xmlns:java="https://schemas.opentest4j.org/reporting/java/0.1.0">
+<e:events xmlns="https://schemas.opentest4j.org/reporting/core/0.1.0" xmlns:e="https://schemas.opentest4j.org/reporting/events/0.1.0" xmlns:java="https://schemas.opentest4j.org/reporting/java/0.1.0" xmlns:r="https://schemas.opentest4j.org/reporting/retry/0.1.0">
   <infrastructure>
     <hostName>
       wonderland
@@ -39,7 +39,11 @@ exports[`events example 1`] = `
         <filePosition line="42" column="17"/>
       </fileSource>
     </sources>
-    <result status="FAILED"/>
+    <result status="FLAKY">
+      <r:execution status="FAILED" id="execution one"/>
+      <r:execution status="FAILED" id="execution two"/>
+      <r:execution status="SUCCESSFUL" id="execution three"/>
+    </result>
   </e:finished>
 </e:events>"
 `;
