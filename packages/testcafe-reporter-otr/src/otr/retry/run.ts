@@ -2,27 +2,27 @@ import { Status } from '../core'
 import { Context, QualifiedName, Element } from '../xml/xml'
 import { retryNamespace } from './namespace'
 
-class Execution extends Element {
-  static Element = QualifiedName.of(retryNamespace, 'execution')
+class Run extends Element {
+  static Element = QualifiedName.of(retryNamespace, 'run')
   static Id = QualifiedName.of(retryNamespace, 'id')
   static Status = QualifiedName.of(retryNamespace, 'status')
 
   constructor(context: Context) {
-    super(context, Execution.Element)
+    super(context, Run.Element)
   }
 
   withId(id: string) {
-    return super.withAttribute(Execution.Id, id)
+    return super.withAttribute(Run.Id, id)
   }
 
   withStatus(status: Status) {
-    return super.withAttribute(Execution.Status, status)
+    return super.withAttribute(Run.Status, status)
   }
 }
 
-export const execution = (status: Status, consumer?: (execution: Execution) => void) => {
+export const run = (status: Status, consumer?: (execution: Run) => void) => {
   return (context: Context) => {
-    const executionElement = new Execution(context).openTag().withStatus(status)
+    const executionElement = new Run(context).openTag().withStatus(status)
     consumer?.(executionElement)
     executionElement.closeTag()
   }

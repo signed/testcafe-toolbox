@@ -16,7 +16,7 @@ import {
 } from './core'
 import { eventsNamespace, EventsWriter, finished, intoString, started } from './events'
 import { javaNamespace, javaVersion } from './java'
-import { execution, retryNamespace } from './retry'
+import { run, retryNamespace } from './retry'
 import { NamespaceRegistry } from './xml/xml'
 
 test('events example', () => {
@@ -66,17 +66,17 @@ test('events example', () => {
         .append(
           result('FLAKY', (_) => {
             _.append(
-              execution('FAILED', (execution) => {
+              run('FAILED', (execution) => {
                 execution.withId('execution one')
               }),
             )
             _.append(
-              execution('FAILED', (execution) => {
+              run('FAILED', (execution) => {
                 execution.withId('execution two')
               }),
             )
             _.append(
-              execution('SUCCESSFUL', (execution) => {
+              run('SUCCESSFUL', (execution) => {
                 execution.withId('execution three')
               }),
             )

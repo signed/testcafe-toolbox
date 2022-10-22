@@ -1,2 +1,2 @@
 export { retryNamespace } from './namespace'
-export { execution } from './execution'
+export { run } from './run'

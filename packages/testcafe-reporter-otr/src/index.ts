@@ -2,7 +2,7 @@ import { Clock, SystemTime } from './otr/clock'
 import { coreNamespace, fileSource, hostName, infrastructure, result, sources, Status, userName } from './otr/core'
 
 import { eventsNamespace, EventsWriter, finished, started, Writer } from './otr/events'
-import { execution, retryNamespace } from './otr/retry'
+import { run, retryNamespace } from './otr/retry'
 import { NamespaceRegistry } from './otr/xml/xml'
 
 import {
@@ -137,7 +137,7 @@ module.exports = function pluginFactory(): ReporterPluginObject {
               test.environments.forEach((environment) => {
                 environment.executions.forEach((testcafeExecution) => {
                   _.append(
-                    execution(testcafeExecution.status, (ex) => {
+                    run(testcafeExecution.status, (ex) => {
                       ex.withId(testcafeExecution.id)
                     }),
                   )
