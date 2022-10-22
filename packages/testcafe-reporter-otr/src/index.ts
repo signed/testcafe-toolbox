@@ -3,6 +3,7 @@ import { coreNamespace, fileSource, hostName, infrastructure, result, sources, S
 
 import { eventsNamespace, EventsWriter, finished, started, Writer } from './otr/events'
 import { run, retryNamespace } from './otr/retry'
+import { reason } from './otr/retry/run'
 import { NamespaceRegistry } from './otr/xml/xml'
 
 import {
@@ -45,12 +46,13 @@ type Test = {
 
 type Environment = {
   name: string
-  executions: TestExecution[]
+  runs: TestRun[]
 }
 
-type TestExecution = {
+type TestRun = {
   id: string
   status: Status
+  reason?: string
   //should contain artifacts from the execution like
   //- screenshot
   //- video
@@ -115,16 +117,22 @@ module.exports = function pluginFactory(): ReporterPluginObject {
       }
       const end = new Date(test.start.getTime() + testRunInfo.durationMs)
       const environments = testRunInfo.browsers.map((browser) => {
-        const environment: Environment = { name: browser.name, executions: [] }
+        const environment: Environment = { name: browser.name, runs: [] }
         browser.quarantineAttemptsTestRunIds?.forEach((runId) => {
-          const quarantine = testRunInfo.quarantine
-          if (quarantine === null) {
+          const quarantineContainer = testRunInfo.quarantine
+          if (quarantineContainer === null) {
             throw new Error('quarantine not present, although quarantineAttemptsTestRunIds are. Should not happen')
           }
-          const status: Status = quarantine[runId].passed ? 'SUCCESSFUL' : 'FAILED'
+          const quarantine = quarantineContainer[runId]
+          const status: Status = quarantine.passed ? 'SUCCESSFUL' : 'FAILED'
           const id = runId
+          let reason = undefined
+          if (quarantine.errors.length > 0) {
+            const error = quarantine.errors[0]
+            reason = error.errMsg
+          }
 
-          environment.executions.push({ id, status })
+          environment.runs.push({ id, status, reason })
         })
         return environment
       })
@@ -135,10 +143,13 @@ module.exports = function pluginFactory(): ReporterPluginObject {
           finished.append(
             result(toStatus(testRunInfo), (_) => {
               test.environments.forEach((environment) => {
-                environment.executions.forEach((testcafeExecution) => {
+                environment.runs.forEach((testRun) => {
                   _.append(
-                    run(testcafeExecution.status, (ex) => {
-                      ex.withId(testcafeExecution.id)
+                    run(testRun.status, (run) => {
+                      run.withId(testRun.id)
+                      if (testRun.reason) {
+                        run.append(reason(testRun.reason))
+                      }
                     }),
                   )
                 })

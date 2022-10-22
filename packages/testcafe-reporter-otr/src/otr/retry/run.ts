@@ -27,3 +27,17 @@ export const run = (status: Status, consumer?: (execution: Run) => void) => {
     executionElement.closeTag()
   }
 }
+
+class Reason extends Element {
+  static Element = QualifiedName.of(retryNamespace, 'reason')
+
+  constructor(context: Context) {
+    super(context, Reason.Element)
+  }
+}
+
+export const reason = (text: string) => {
+  return (context: Context) => {
+    new Reason(context).openTag().withContent(text).closeTag()
+  }
+}
