@@ -29,11 +29,14 @@ const intoReporterPlugin = (host: ReporterPluginHost): Writer => {
 
 const clock: Clock = new SystemTime()
 
-const toStatus = (testRunInfo: TestRunInfo): Status => {
-  if (testRunInfo.skipped) {
+const toStatus = (test: Test): Status => {
+  if (test.skipped) {
     return 'SKIPPED'
   }
-  if (testRunInfo.errs.length > 0) {
+  if (test.flaky) {
+    return 'FLAKY'
+  }
+  if (test.failed) {
     return 'FAILED'
   }
   return 'SUCCESSFUL'
@@ -41,6 +44,9 @@ const toStatus = (testRunInfo: TestRunInfo): Status => {
 
 type Test = {
   start: Date
+  skipped: boolean
+  flaky: boolean
+  failed: boolean
   environments: Environment[]
 }
 
@@ -106,7 +112,10 @@ module.exports = function pluginFactory(): ReporterPluginObject {
     reportTestStart: async function (name: string, meta: Meta, testStartInfo: TestStartInfo) {
       const start = new Date(testStartInfo.startTime)
       const testId = testStartInfo.testId
-      tests.set(testId, { start, environments: [] })
+      const skipped = testStartInfo.skipped
+      const flaky = false
+      const failed = false
+      tests.set(testId, { start, environments: [], skipped, flaky, failed })
       events.append(started(testId, name, start, (_) => _.withParentId(currentFixtureId)))
     },
     reportTestDone: async function (name: string, testRunInfo: TestRunInfo, _meta?: Meta) {
@@ -115,6 +124,9 @@ module.exports = function pluginFactory(): ReporterPluginObject {
       if (test === undefined) {
         throw new Error(`no test data found for test "${testId}"`)
       }
+      test.flaky = testRunInfo.unstable
+      test.skipped = testRunInfo.skipped
+      test.failed = testRunInfo.errs.length > 0
       const end = new Date(test.start.getTime() + testRunInfo.durationMs)
       const environments = testRunInfo.browsers.map((browser) => {
         const environment: Environment = { name: browser.name, runs: [] }
@@ -141,7 +153,7 @@ module.exports = function pluginFactory(): ReporterPluginObject {
       events.append(
         finished(testId, end, (finished) => {
           finished.append(
-            result(toStatus(testRunInfo), (_) => {
+            result(toStatus(test), (_) => {
               test.environments.forEach((environment) => {
                 environment.runs.forEach((testRun) => {
                   _.append(
