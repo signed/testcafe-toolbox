@@ -40,9 +40,9 @@ exports[`events example 1`] = `
       </fileSource>
     </sources>
     <result status="FLAKY">
-      <r:execution status="FAILED" id="execution one"/>
-      <r:execution status="FAILED" id="execution two"/>
-      <r:execution status="SUCCESSFUL" id="execution three"/>
+      <r:run status="FAILED" id="execution one"/>
+      <r:run status="FAILED" id="execution two"/>
+      <r:run status="SUCCESSFUL" id="execution three"/>
     </result>
   </e:finished>
 </e:events>"
