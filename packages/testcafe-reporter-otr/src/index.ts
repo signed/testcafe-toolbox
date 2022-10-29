@@ -1,8 +1,18 @@
 import { Clock, SystemTime } from './otr/clock'
-import { coreNamespace, fileSource, hostName, infrastructure, result, sources, Status, userName } from './otr/core'
+import {
+  attachments,
+  coreNamespace,
+  fileSource,
+  hostName,
+  infrastructure,
+  result,
+  sources,
+  Status,
+  userName,
+} from './otr/core'
 
 import { eventsNamespace, EventsWriter, finished, started, Writer } from './otr/events'
-import { run, retryNamespace } from './otr/retry'
+import { run, retryNamespace, data, link, entry } from './otr/retry'
 import { reason } from './otr/retry/run'
 import { NamespaceRegistry } from './otr/xml/xml'
 
@@ -59,11 +69,29 @@ type TestRun = {
   id: string
   status: Status
   reason?: string
-  //should contain artifacts from the execution like
-  //- screenshot
+  screenshotPath?: string
+  //should contain artifacts from the run like
   //- video
   //- stacktrace
   //- assertion error
+}
+
+type Attachment = {
+  runId: string
+  screenshotPath: string
+}
+
+const attachmentsFrom = (test: Test): Attachment[] => {
+  return test.environments.reduce((acc: Attachment[], environment) => {
+    const newAttachments = environment.runs.reduce((att: Attachment[], run) => {
+      if (run.screenshotPath) {
+        const newAttachment = { runId: run.id, screenshotPath: run.screenshotPath }
+        return [...att, newAttachment]
+      }
+      return att
+    }, [])
+    return [...acc, ...newAttachments]
+  }, [])
 }
 
 module.exports = function pluginFactory(): ReporterPluginObject {
@@ -130,6 +158,7 @@ module.exports = function pluginFactory(): ReporterPluginObject {
       const end = new Date(test.start.getTime() + testRunInfo.durationMs)
       const environments = testRunInfo.browsers.map((browser) => {
         const environment: Environment = { name: browser.name, runs: [] }
+
         browser.quarantineAttemptsTestRunIds?.forEach((runId) => {
           const quarantineContainer = testRunInfo.quarantine
           if (quarantineContainer === null) {
@@ -143,8 +172,14 @@ module.exports = function pluginFactory(): ReporterPluginObject {
             const error = quarantine.errors[0]
             reason = error.errMsg
           }
-
-          environment.runs.push({ id, status, reason })
+          const failScreenshot = testRunInfo.screenshots.find((screenshot) => {
+            return screenshot.testRunId === runId && screenshot.takenOnFail
+          })
+          let screenshotPath
+          if (failScreenshot) {
+            screenshotPath = failScreenshot.screenshotPath
+          }
+          environment.runs.push({ id, status, reason, screenshotPath })
         })
         return environment
       })
@@ -152,6 +187,21 @@ module.exports = function pluginFactory(): ReporterPluginObject {
 
       events.append(
         finished(testId, end, (finished) => {
+          const createdAttachments = attachmentsFrom(test)
+          if (createdAttachments.length > 0) {
+            finished.append(
+              attachments((_) => {
+                createdAttachments.forEach((attachment) => {
+                  _.append(
+                    data((_) => {
+                      _.append(link(attachment.runId))
+                      _.append(entry('failScreenshotPath', attachment.screenshotPath))
+                    }),
+                  )
+                })
+              }),
+            )
+          }
           finished.append(
             result(toStatus(test), (_) => {
               test.environments.forEach((environment) => {
