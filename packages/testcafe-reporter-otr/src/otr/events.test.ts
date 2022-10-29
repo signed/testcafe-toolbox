@@ -1,6 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { Clock } from './clock'
 import {
+  attachments,
   coreNamespace,
   directorySource,
   filePosition,
@@ -16,7 +17,7 @@ import {
 } from './core'
 import { eventsNamespace, EventsWriter, finished, intoString, started } from './events'
 import { javaNamespace, javaVersion } from './java'
-import { run, retryNamespace } from './retry'
+import { run, retryNamespace, data, link, entry } from './retry'
 import { NamespaceRegistry } from './xml/xml'
 
 test('events example', () => {
@@ -62,6 +63,24 @@ test('events example', () => {
               }),
             ),
           ),
+        )
+        .append(
+          attachments((_) => {
+            _.append(
+              data((_) => {
+                _.append(link('execution one'))
+                _.append(entry('one', '1st content'))
+                _.append(entry('two', '2nd content'))
+              }),
+            )
+            _.append(
+              data((_) => {
+                _.append(link('execution two'))
+                _.append(entry('three', '3rd content'))
+                _.append(entry('four', '4th content'))
+              }),
+            )
+          }),
         )
         .append(
           result('FLAKY', (_) => {

@@ -39,6 +39,26 @@ exports[`events example 1`] = `
         <filePosition line="42" column="17"/>
       </fileSource>
     </sources>
+    <attachments>
+      <r:data>
+        <r:link runId="execution one"/>
+        <r:entry key="one">
+          1st content
+        </r:entry>
+        <r:entry key="two">
+          2nd content
+        </r:entry>
+      </r:data>
+      <r:data>
+        <r:link runId="execution two"/>
+        <r:entry key="three">
+          3rd content
+        </r:entry>
+        <r:entry key="four">
+          4th content
+        </r:entry>
+      </r:data>
+    </attachments>
     <result status="FLAKY">
       <r:run status="FAILED" id="execution one"/>
       <r:run status="FAILED" id="execution two"/>
