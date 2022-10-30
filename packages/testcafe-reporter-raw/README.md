@@ -1,7 +1,7 @@
 # custom [testcafe reporter][testcafe-reporter]
 
 Intended for exploring the reporter api protocol in testcafe.
-Each interaction with the customer reporter is serialize and written to the console.
+Each interaction with the customer reporter is serialized and written to the console.
 
 # How to use
 Testcafe does not support [scoped reports](https://github.com/DevExpress/testcafe/issues/4692#issuecomment-578790454).
