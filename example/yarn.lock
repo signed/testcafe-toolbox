@@ -3143,10 +3143,10 @@ testcafe-reporter-minimal@^2.1.0:
   resolved "https://registry.yarnpkg.com/testcafe-reporter-minimal/-/testcafe-reporter-minimal-2.1.0.tgz#676f03547634143c6eaf3ab52868273a4bebf421"
   integrity sha512-PCqteQ5+vlqNvLMljq6QrTFmmRVQNSW1iGbRDUv4gif8V4L5OXTZPIU0RyRusKpk7gu5wKyCE0CT7hC7V9+/mg==
 
-"testcafe-reporter-raw@npm:@signed/testcafe-reporter-raw@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@signed/testcafe-reporter-raw/-/testcafe-reporter-raw-0.1.1.tgz#ce0cc6e3b1f3dff7988156694dd83c15fb2bbf42"
-  integrity sha512-WX1sQZhIlK5KDrmFIjBcZ4zYJY1CM6rsG98p2VfHT6p5Ubh0arpWiJCGcI6MiAWJhahJkQYy3NXyRFagDxhsXQ==
+"testcafe-reporter-raw@npm:@signed/testcafe-reporter-raw@0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@signed/testcafe-reporter-raw/-/testcafe-reporter-raw-0.2.1.tgz#9237437723358e1072e51972e151ae2bbd7488f6"
+  integrity sha512-P3yU/0iV3peZWfzMGmmOaVQLsykn+EqminrlsyhJj3UpJdzfv6+Hi6Gu9siIfHsE1yLcg+7HTbDLchiIYykifw==
 
 testcafe-reporter-spec@^2.1.1:
   version "2.1.1"

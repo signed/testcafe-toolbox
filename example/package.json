@@ -2,13 +2,13 @@
   "name": "@signed/testcafe-toolbox-example",
   "private": true,
   "scripts": {
-    "testcafe:quarantine": "testcafe --reporter spec,raw:out/raw-quarantine.txt,otr:out/otr-quarantine.xml --quarantine-mode attemptLimit=4,successThreshold=2 --screenshots takeOnFails=true opera,chrome fixtures/quarantine",
-    "testcafe:plain": "testcafe --reporter spec,raw:out/raw-plain.txt,otr:out/otr-plain.xml opera,chrome fixtures/quarantine",
+    "testcafe:quarantine": "testcafe --reporter spec,raw:out/raw-quarantine.json,otr:out/otr-quarantine.xml --quarantine-mode attemptLimit=4,successThreshold=2 --screenshots takeOnFails=true chrome fixtures/quarantine",
+    "testcafe:plain": "testcafe --reporter spec,raw:out/raw-plain.json,otr:out/otr-plain.xml --screenshots takeOnFails=true chrome fixtures/quarantine",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "testcafe": "2.0.0",
-    "testcafe-reporter-raw": "npm:@signed/testcafe-reporter-raw@0.1.1",
+    "testcafe-reporter-raw": "npm:@signed/testcafe-reporter-raw@0.2.1",
     "typescript": "4.8.3"
   }
 }
