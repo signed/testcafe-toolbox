@@ -1,3 +1,5 @@
+import { relative } from 'path'
+import * as process from 'process'
 import { Clock, SystemTime } from './otr/clock'
 import {
   attachments,
@@ -94,6 +96,8 @@ const attachmentsFrom = (test: Test): Attachment[] => {
   }, [])
 }
 
+const makeRelativeToProjectBase = (path: string) => relative(process.cwd(), path)
+
 module.exports = function pluginFactory(): ReporterPluginObject {
   const tests = new Map<string, Test>()
   const fixtureNameToFixtureId = new Map<string, string>()
@@ -133,7 +137,7 @@ module.exports = function pluginFactory(): ReporterPluginObject {
       currentFixtureId = id
       events.append(
         started(id, name, clock.now(), (started) => {
-          started.append(sources((sources) => sources.append(fileSource(path))))
+          started.append(sources((sources) => sources.append(fileSource(makeRelativeToProjectBase(path)))))
         }),
       )
     },
@@ -195,7 +199,7 @@ module.exports = function pluginFactory(): ReporterPluginObject {
                   _.append(
                     data((_) => {
                       _.append(link(attachment.runId))
-                      _.append(entry('failScreenshotPath', attachment.screenshotPath))
+                      _.append(entry('failScreenshotPath', makeRelativeToProjectBase(attachment.screenshotPath)))
                     }),
                   )
                 })
