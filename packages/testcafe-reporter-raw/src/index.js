@@ -8,8 +8,8 @@ module.exports = function () {
         JSON.stringify(
           call,
           (key, value) => {
-            if (Buffer.isBuffer(value)) {
-              return "masked";
+            if (key === "screenshotData") {
+              return `masked`;
             }
             return value;
           },
@@ -110,7 +110,7 @@ module.exports = function () {
         },
         additionalArguments: rest,
       });
-      this.write(JSON.stringify(this.calls, null, 2));
+      this.write(`[\n${this.calls.join(",\n")}\n]`);
       this.newline();
     },
   };

@@ -1,6 +1,6 @@
 {
   "name": "@signed/testcafe-reporter-raw",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "reporter that writes all interactions to the console",
   "license": "MIT",
   "keywords": [
