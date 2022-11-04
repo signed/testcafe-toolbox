@@ -15,6 +15,9 @@ import {
   tags,
   userName,
 } from './core'
+import { environmentNamespace } from './environment'
+import { browser } from './environment/browser'
+import { environment } from './environment/environment'
 import { eventsNamespace, EventsWriter, finished, intoString, started } from './events'
 import { javaNamespace, javaVersion } from './java'
 import { run, retryNamespace, data, link, entry } from './retry'
@@ -27,6 +30,7 @@ test('events example', () => {
     e: eventsNamespace,
     java: javaNamespace,
     r: retryNamespace,
+    env: environmentNamespace,
   })
   const target = intoString()
   const events = new EventsWriter(namespaceRegistry).startEmitting(target)
@@ -85,18 +89,23 @@ test('events example', () => {
         .append(
           result('FLAKY', (_) => {
             _.append(
-              run('FAILED', (execution) => {
-                execution.withId('execution one')
-              }),
-            )
-            _.append(
-              run('FAILED', (execution) => {
-                execution.withId('execution two')
-              }),
-            )
-            _.append(
-              run('SUCCESSFUL', (execution) => {
-                execution.withId('execution three')
+              environment((_) => {
+                _.append(browser('opera', '92.0.4561.43'))
+                _.append(
+                  run('FAILED', (execution) => {
+                    execution.withId('execution one')
+                  }),
+                )
+                _.append(
+                  run('FAILED', (execution) => {
+                    execution.withId('execution two')
+                  }),
+                )
+                _.append(
+                  run('SUCCESSFUL', (execution) => {
+                    execution.withId('execution three')
+                  }),
+                )
               }),
             )
           }),
