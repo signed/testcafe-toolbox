@@ -12,6 +12,9 @@ import {
   Status,
   userName,
 } from './otr/core'
+import { environmentNamespace } from './otr/environment'
+import { browser } from './otr/environment/browser'
+import { environment } from './otr/environment/environment'
 
 import { eventsNamespace, EventsWriter, finished, started, Writer } from './otr/events'
 import { run, retryNamespace, data, link, entry } from './otr/retry'
@@ -54,6 +57,14 @@ const toStatus = (test: Test): Status => {
   return 'SUCCESSFUL'
 }
 
+const environmentToStatus = (environment: Environment): Status => {
+  const uniqueRunStatus = [...new Set(environment.runs.map((run) => run.status))]
+  if (uniqueRunStatus.length === 1) {
+    return uniqueRunStatus[0]
+  }
+  return 'FLAKY'
+}
+
 type Test = {
   start: Date
   skipped: boolean
@@ -64,6 +75,7 @@ type Test = {
 
 type Environment = {
   name: string
+  version: string
   runs: TestRun[]
 }
 
@@ -107,7 +119,11 @@ module.exports = function pluginFactory(): ReporterPluginObject {
   return {
     noColors: true,
     init: async function () {
-      const namespaceRegistry = NamespaceRegistry.of(coreNamespace, { e: eventsNamespace, r: retryNamespace })
+      const namespaceRegistry = NamespaceRegistry.of(coreNamespace, {
+        e: eventsNamespace,
+        r: retryNamespace,
+        env: environmentNamespace,
+      })
       events = new EventsWriter(namespaceRegistry).startEmitting(intoReporterPlugin(this))
       events.append(infrastructure((_) => _.append(hostName('wonderland')).append(userName('alice'))))
     },
@@ -161,7 +177,7 @@ module.exports = function pluginFactory(): ReporterPluginObject {
       test.failed = testRunInfo.errs.length > 0
       const end = new Date(test.start.getTime() + testRunInfo.durationMs)
       const environments = testRunInfo.browsers.map((browser) => {
-        const environment: Environment = { name: browser.name, runs: [] }
+        const environment: Environment = { name: browser.name, version: browser.version, runs: [] }
 
         browser.quarantineAttemptsTestRunIds?.forEach((runId) => {
           const quarantineContainer = testRunInfo.quarantine
@@ -208,17 +224,22 @@ module.exports = function pluginFactory(): ReporterPluginObject {
           }
           finished.append(
             result(toStatus(test), (_) => {
-              test.environments.forEach((environment) => {
-                environment.runs.forEach((testRun) => {
-                  _.append(
-                    run(testRun.status, (run) => {
-                      run.withId(testRun.id)
-                      if (testRun.reason) {
-                        run.append(reason(testRun.reason))
-                      }
-                    }),
-                  )
-                })
+              test.environments.forEach((env) => {
+                _.append(
+                  environment(environmentToStatus(env), (_) => {
+                    _.append(browser(env.name, env.version))
+                    env.runs.forEach((testRun) => {
+                      _.append(
+                        run(testRun.status, (run) => {
+                          run.withId(testRun.id)
+                          if (testRun.reason) {
+                            run.append(reason(testRun.reason))
+                          }
+                        }),
+                      )
+                    })
+                  }),
+                )
               })
             }),
           )

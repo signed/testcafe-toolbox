@@ -89,7 +89,7 @@ test('events example', () => {
         .append(
           result('FLAKY', (_) => {
             _.append(
-              environment((_) => {
+              environment('FLAKY', (_) => {
                 _.append(browser('opera', '92.0.4561.43'))
                 _.append(
                   run('FAILED', (execution) => {
